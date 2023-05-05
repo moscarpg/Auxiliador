@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Usuários</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="{% static '/css/login.css' %}" rel="stylesheet">
+    <!------ Include the above in your HEAD tag ---------->
+</head>
+
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <div id="login">
+            <h3 class="text-center text-white pt-5">Auxiliador de Concursos</h3>
+            <div class="container">
+                <div id="login-row" class="row justify-content-center align-items-center">
+                    <div id="login-column" class="col-md-6">
+                        <div id="login-box" class="col-md-12">
+                            <form id="login-form" class="form" action="{% url 'cadastro' %}" method="post">
+                                {% csrf_token %}
+                                <h3 class="text-center text-info">Login</h3>
+                                <div class="form-group">
+                                    {{form_usuario.username.errors}}
+                                    <label for="username" class="text-info">Usuário:</label><br>
+                                    <input type="text" name="username" maxlength="150" autocapitalize="none" autocomplete="username" autofocus="" required="" id="id_username" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    {{form_usuario.password.errors}}
+                                    <label for="password" class="text-info">Senha:</label><br>
+                                    <input type="password" name="password1" autocomplete="new-password" required="" id="id_password1" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    {{form_usuario.password.errors}}
+                                    <label for="password" class="text-info">Confirme sua senha:</label><br>
+                                    <input type="password" name="password2" autocomplete="new-password" required="" id="id_password2" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <br>
+                                    <input type="submit" name="submit" class="btn btn-info btn-md" value="Cadastrar">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</body>
+</html>

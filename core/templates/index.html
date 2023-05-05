@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    {% block title %}<title>Auxiliador</title>{% endblock %}
+
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <!-- Our Custom CSS -->
+    <link href="{% static '/css/style.css' %}" rel="stylesheet">
+
+    <!-- Font Awesome JS -->
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #6d7fcc;">
+        <div class="btn-group ml-auto">
+            <button type="button" class="btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{user.username}}
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+            <button class="dropdown-item" type="button">Configurações</button>
+            <button class="dropdown-item" type="button">Mudar senha</button>
+            <div class="dropdown-divider"></div>
+              <button class="dropdown-item" type="submit"><a href="{% url 'deslogar' %}">Deslogar</a></button>
+            </div>
+          </div>
+    </nav>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Auxiliador de Concursos</h3>
+            </div>
+    
+            <ul class="list-unstyled components">
+                <li><a href="{% url 'concursos' %}" style="font-weight: bold;">Seus concursos:</a></li>
+                {% for concurso in concursos %}
+                    <li>
+                        <div id="accordionExample{{concurso.id}}">
+                              <div id="heading{{concurso.id}}">
+                                  <a data-toggle="collapse" data-target="#collapse{{concurso.id}}" aria-expanded="false" aria-controls="collapse{{concurso.id}}">
+                                    {{concurso.nome}}
+                                  </a>
+                                </h5>
+                              </div>
+                              <div id="collapse{{concurso.id}}" class="collapse" aria-labelledby="heading{{concurso.id}}" data-parent="#accordionExample{{concurso.id}}">
+                                <a href="{% url 'materias' concurso.id %}" style="margin-left: 25px;">Matérias</a>
+                                <a href="{% url 'tarefas' concurso.id %}" style="margin-left: 25px;">Tarefas</a>
+                            </div>
+                        <!-- <a class="dropdown-toggle" type="button" id="dropdownMenuButton{{concurso.nome}}" data-bs-toggle="dropdown" aria-expanded="false">{{concurso.nome}}</a> -->
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>   
+        <div class="col-sm">
+            <div class="container" style="background-color: bisque;">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery CDN - Slim version (=without AJAX) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- Popper.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    
+    <script language="javascript">
+        $(function () {
+
+            // Oculta as opções do segundo select:
+            $("#select_aula option").hide();
+            
+            // Observa o evento change do primeiro select:
+            $("#select_materia").on("change", function () {
+            
+                // Recupera o valor selecionado:
+                let course = $("#select_materia").val();
+                
+                // Oculta as opções atuais:
+                $("#select_aula option").hide();
+                
+                // Exibe as opções conforme a seleção:
+                $("#select_aula option[data-course="+ course +"]").show();
+            
+            });
+
+            });
+    </script>
+</body>
+
+</html>

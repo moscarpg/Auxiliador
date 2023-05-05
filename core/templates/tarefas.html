@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+{% extends "index.html" %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}<title>{{concurso.nome}}</title>{% endblock %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+</head>
+<body>
+    {% block content %}
+    <table class="table container">
+        <tr>
+            <th>Descrição</th>
+            <th>Matéria</th>
+            <th>Aula</th>
+            <th>Minutos</th>
+            <th>Data da revisão</th>
+        </tr>
+        {% for tarefa in tarefas %}
+        <tr>
+            <td>{{tarefa.descricao}}</td>
+            <td>{{tarefa.aula.materia.nome}}</td>
+            <td>{{tarefa.aula.nome}}</td>
+            <td>{{tarefa.minutos}}</td>
+            {% if tarefa.data_revisao == data_atual %}               
+                <td><input disabled class="form-control" type="date" style="color:red; font-weight: bold;" id="exibicao_data_revisao" value="{{tarefa.data_revisao}}"></td>
+            {% else %}
+                <td><input disabled class="form-control" type="date" id="exibicao_data_revisao" value="{{tarefa.data_revisao}}"></td>
+            {% endif %}
+            <td><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editarTarefa{{tarefa.id}}"><i class="bi bi-pencil-square"></i></button>
+                <div class="modal fade" id="editarTarefa{{tarefa.id}}" tabindex="-1" aria-labelledby="labelEdição" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="labelEdição">Editar tarefa</h1>
+                        </div>
+                        <div class="modal-body from-group">
+                          <form action="{% url 'editarTarefa' tarefa.id concurso.id %}" method="POST">
+                            {% csrf_token %}
+                            <label for="materia_disabled">Matéria</label>
+                            <input type="text" value="{{tarefa.aula.materia.nome}}" class="form-control" disabled id="materia_disabled">
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <label for="mudar_descricao"> Descrição</label>
+                                    <input type="text" name="mudar_descricao" value="{{tarefa.descricao}}" class="form-control" id="mudar_descricao">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label for="mudar_tempo">Minutos</label>
+                                    <input type="number" name="mudar_tempo" value="{{tarefa.minutos}}" class="form-control" id="mudar_tempo">
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label for="mudar_data">Data</label>
+                                    <input type="date" name="mudar_data" value="{{tarefa.data}}" class="form-control" id="mudar_data">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="select_mudar_aula">Aula</label>
+                                    <select class="form-select form-control" aria-label="Default select example" id="select_mudar_aula" name="mudar_aula">
+                                        {% for materia in materias %}
+                                            {% for aula in aulas %}
+                                                {% if tarefa.aula.materia.id == aula.materia.id and aula.materia.id == materia.id %}
+                                                    {% if tarefa.aula.id == aula.id %}
+                                                        <option data-course="{{ aula.materia.id }}" value="{{aula.id}}" selected="selected">{{aula.nome}}</option>
+                                                    {%else%}
+                                                        <option data-course="{{ aula.materia.id }}" value="{{aula.id}}">{{aula.nome}}</option>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                              <button type="submit" class="btn btn-primary">Salvar</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+            <td><form action="{% url 'removerTarefa' tarefa.id concurso.id %}">
+                <button type="submit" class="btn btn-danger bi bi-trash"><i></i></button>
+        </form></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <form action="{% url 'cadastrarTarefa' concurso.id%}" method="POST" class="container form-group">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-6">
+                <label for="descricao">Descrição</label>
+                <input type="text" name="descricao" class="form-control" placeholder="Descrição" id="descricao">
+            </div>
+            <div class="col-sm-4">
+                <label for="materia">Matéria</label>
+                <select class="form-select form-control" aria-label="Default select example" id="select_materia">
+                    <option value="none" selected="selected"> Escolha uma matéria</option>
+                    {% for materia in materias %}
+                        <option value="{{materia.id}}">{{materia.nome}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <label for="tempo">Tempo (minutos)</label>
+                <input type="number" name="tempo" class="form-control" placeholder="Tempo" id="tempo">
+            </div>
+            <div class="col-sm-2">
+                <label for="data">Data</label>
+                <input type="date" name="data" class="form-control" id="data" autofocus required="true" value="{{data_atual}}">
+            </div>
+            <div class="col-sm-4">
+                <label for="aula">Aula</label>
+                <select class="form-select form-control" aria-label="Default select example" id="select_aula" name="aula">
+                    <option value="none" selected="selected">Escolha uma aula</option>
+                    {% for aula in aulas %}
+                        <option data-course="{{ aula.materia.id }}" value="{{aula.id}}">{{aula.nome}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-4">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </form>
+    {% endblock %}
+</body>
+</html>
